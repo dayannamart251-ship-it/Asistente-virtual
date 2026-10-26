@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AURA: Presentación Interactiva del Agente Virtual | UMB Terapia Ocupacional</title>
+  <!-- Tailwind CSS permitido por CSP de Antigravity -->
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.05);
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(13,148,136,0.3);
+      border-radius: 4px;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(13, 148, 136, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
+    }
+    .hotspot-pulse {
+      animation: pulse-ring 2s infinite;
+    }
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(1000%); }
+    }
+    .video-scanline {
+      animation: scanline 8s linear infinite;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-teal-500 selection:text-white">
+
+  <!-- BARRA SUPERIOR: Control de Presentación y Membrete UMB -->
+  <header class="bg-slate-950/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Logo y Título -->
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-lg bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400 font-bold text-sm shadow-inner">
+          UMB
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-sm tracking-wide text-white">AURA • Agente Virtual</span>
+            <span class="text-xs bg-teal-900/60 text-teal-300 px-2 py-0.5 rounded-full border border-teal-500/30">Terapia Ocupacional</span>
+          </div>
+          <p class="text-xs text-slate-400">Recuperación Post-QX de Túnel Carpiano • Paciente Rural 45 años</p>
+        </div>
+      </div>
+
+      <!-- Navegación de Diapositivas (7 Diapositivas) -->
+      <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs overflow-x-auto custom-scroll">
+        <button onclick="goToSlide(0)" id="dot-0" class="nav-dot px-2.5 py-1 rounded-lg font-medium transition bg-teal-600 text-white whitespace-nowrap">1. Portada</button>
+        <button onclick="goToSlide(1)" id="dot-1" class="nav-dot px-2.5 py-1 rounded-lg font-medium transition text-slate-400 hover:text-white whitespace-nowrap">2. Caso Rural</button>
+        <button onclick="goToSlide(2)" id="dot-2" class="nav-dot px-2.5 py-1 rounded-lg font-medium transition text-slate-400 hover:text-white whitespace-nowrap">3. Ejercicios & Videos</button>
+        <button onclick="goToSlide(3)" id="dot-3" class="nav-dot px-2.5 py-1 rounded-lg font-medium transition text-slate-400 hover:text-white whitespace-nowrap">4. Cronograma & Alertas</button>
+        <button onclick="goToSlide(4)" id="dot-4" class="nav-dot px-2.5 py-1 rounded-lg font-medium transition text-slate-400 hover:text-white whitespace-nowrap">5. Puesto Rural</button>
+        <button onclick="goToSlide(5)" id="dot-5" class="nav-dot px-2.5 py-1 rounded-lg font-medium transition text-slate-400 hover:text-white whitespace-nowrap">6. Agente en Vivo</button>
+        <button onclick="goToSlide(6)" id="dot-6" class="nav-dot px-2.5 py-1 rounded-lg font-medium transition text-slate-400 hover:text-white whitespace-nowrap">7. Cierre</button>
+      </div>
+
+      <!-- Controles de Diapositiva (Anterior/Siguiente) -->
+      <div class="flex items-center gap-2">
+        <button onclick="prevSlide()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition" title="Diapositiva anterior">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <span id="slide-indicator" class="text-xs font-mono text-teal-400 px-1">1 / 7</span>
+        <button onclick="nextSlide()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition" title="Diapositiva siguiente">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL DE DIAPOSITIVAS INTERACTIVAS -->
+  <main class="max-w-7xl mx-auto p-4 sm:p-6 flex-1 w-full flex items-center justify-center">
+
+    <!-- ==================== DIAPOSITIVA 1: PORTADA ==================== -->
+    <div id="slide-0" class="slide-view w-full">
+      <div class="bg-gradient-to-br from-slate-900 via-slate-850 to-teal-950/60 border border-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden">
+        
+        <div class="absolute -right-20 -top-20 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-3xl relative z-10 space-y-6">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-semibold tracking-wide uppercase">
+            <span>🎓 Universidad Manuela Beltrán</span>
+            <span>•</span>
+            <span>Facultad de Salud • Terapia Ocupacional</span>
+          </div>
+
+          <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+            AURA: <span class="bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent">Agente Virtual</span> para Tele-rehabilitación en STC
+          </h1>
+
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+            Asistente inteligente diseñado para guiar y monitorear la recuperación post-quirúrgica del <strong>Síndrome del Túnel Carpiano (STC)</strong> en un paciente rural de 45 años. Incorpora <strong>demostraciones en video/animación biomecánica</strong>, fundamentación de <strong>objetivos desde Terapia Ocupacional</strong> y un <strong>cronograma automatizado de pausas y ejercicios con alertas auditivas</strong>.
+          </p>
+
+          <!-- Badges de características del agente -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+            <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3.5">
+              <div class="text-teal-400 font-bold text-sm mb-1 flex items-center gap-2">
+                <span>📹</span> Videos Biomecánicos
+              </div>
+              <p class="text-xs text-slate-400">Demostraciones en movimiento paso a paso de los deslizamientos tendinosos.</p>
+            </div>
+            <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3.5">
+              <div class="text-emerald-400 font-bold text-sm mb-1 flex items-center gap-2">
+                <span>🔔</span> Cronograma con Alertas
+              </div>
+              <p class="text-xs text-slate-400">Pausas activas y horarios programados con avisos audibles y visuales.</p>
+            </div>
+            <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3.5">
+              <div class="text-cyan-400 font-bold text-sm mb-1 flex items-center gap-2">
+                <span>🎯</span> Enfoque T.O. Riguroso
+              </div>
+              <p class="text-xs text-slate-400">Fundamentado en el Marco de Trabajo AOTA (OTPF-4) y el modelo MOHO.</p>
+            </div>
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="pt-4 flex flex-wrap gap-3">
+            <button onclick="nextSlide()" class="px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm shadow-lg shadow-teal-900/40 transition flex items-center gap-2">
+              Iniciar Presentación
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </button>
+            <button onclick="goToSlide(2)" class="px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-sm transition flex items-center gap-2">
+              Ir a Videos de Ejercicios
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            </button>
+            <button onclick="goToSlide(3)" class="px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-sm transition">
+              Ver Cronograma de Alertas
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== DIAPOSITIVA 2: CASO CLÍNICO Y RETO RURAL ==================== -->
+    <div id="slide-1" class="slide-view w-full hidden">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl space-y-6">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-4 gap-2">
+          <div>
+            <span class="text-xs uppercase font-bold text-teal-400 tracking-wider">Módulo Clínico • UMB</span>
+            <h2 class="text-2xl font-bold text-white mt-0.5">Perfil Ocupacional y Barreras del Paciente</h2>
+          </div>
+          <span class="px-3 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 text-xs font-medium w-fit">
+            Caso Clínico: 45 años • Zona Rural
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-5 space-y-4">
+            <h3 class="text-base font-semibold text-teal-300 flex items-center gap-2">
+              <svg class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+              Condición de Salud y Diagnóstico
+            </h3>
+            
+            <ul class="text-xs text-slate-300 space-y-2.5">
+              <li class="flex items-start gap-2">
+                <span class="text-teal-400 font-bold">•</span>
+                <span><strong>Diagnóstico:</strong> Síndrome del Túnel Carpiano (CIE-10 G56.0), intervención quirúrgica reciente de descompresión del retináculo flexor.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-teal-400 font-bold">•</span>
+                <span><strong>Edad y Contexto:</strong> 45 años, labor mixta (labores administrativas remotas y tareas domésticas/agrícolas en zona rural).</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-teal-400 font-bold">•</span>
+                <span><strong>Barrera Geográfica:</strong> Residencia a más de 2 horas del hospital municipal; imposibilidad de asistir a sesiones presenciales diarias de T.O.</span>
+              </li>
+            </ul>
+
+            <div class="p-3 bg-teal-950/40 border border-teal-800/40 rounded-xl text-xs text-teal-200">
+              <strong>Rol del Terapeuta Ocupacional:</strong> Prevenir adherencias cicatrizales, favorecer la movilidad funcional sin sobrecarga y adecuar su entorno cotidiano.
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 flex items-start gap-3">
+              <div class="w-9 h-9 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center font-bold flex-shrink-0">1</div>
+              <div>
+                <h4 class="font-bold text-white text-xs sm:text-sm">Recordatorio y Adherencia al Ejercicio</h4>
+                <p class="text-xs text-slate-400 mt-1">El paciente olvida realizar los deslizamientos tendinosos 3 veces al día o los ejecuta con demasiada fuerza, provocando inflamación.</p>
+              </div>
+            </div>
+
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 flex items-start gap-3">
+              <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold flex-shrink-0">2</div>
+              <div>
+                <h4 class="font-bold text-white text-xs sm:text-sm">Adaptación del Puesto en Casa</h4>
+                <p class="text-xs text-slate-400 mt-1">Mobiliario estándar del campo (mesas altas de madera rústica y sillas de comedor duras) que obligan a flexionar la muñeca a ángulos perjudiciales.</p>
+              </div>
+            </div>
+
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 flex items-start gap-3">
+              <div class="w-9 h-9 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold flex-shrink-0">3</div>
+              <div>
+                <h4 class="font-bold text-white text-xs sm:text-sm">Protección Articular en Tareas Rurales</h4>
+                <p class="text-xs text-slate-400 mt-1">Peligro en actividades cotidianas como escurrir ropa gruesa retorciendo, cargar baldes pesados o pinzar herramientas sin engrosador.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="flex justify-end pt-2">
+          <button onclick="nextSlide()" class="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-medium text-xs transition flex items-center gap-2">
+            Ver Demostración en Video y Objetivos de T.O. →
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== DIAPOSITIVA 3: EJERCICIOS, VIDEOS Y OBJETIVOS DE T.O. ==================== -->
+    <div id="slide-2" class="slide-view w-full hidden">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl space-y-6">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-4 gap-2">
+          <div>
+            <span class="text-xs uppercase font-bold text-teal-400 tracking-wider">Módulo de Prescripción y Biomecánica</span>
+            <h2 class="text-2xl font-bold text-white mt-0.5">Videos Demostrativos y Objetivos de Terapia Ocupacional</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1 rounded-full bg-teal-950 text-teal-300 border border-teal-800 font-mono text-xs">
+              Protocolo Post-QX: Wehbé & Hunter
+            </span>
+          </div>
+        </div>
+
+        <!-- Selector de Ejercicios -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <button onclick="selectExercise(0)" id="ex-btn-0" class="ex-card p-3.5 rounded-xl border border-teal-500 bg-teal-950/40 text-left transition">
+            <span class="text-[11px] font-bold text-teal-400 block uppercase">Demostración 1</span>
+            <span class="font-semibold text-white text-xs block mt-0.5">Deslizamiento Tendinoso</span>
+            <span class="text-[11px] text-slate-400">4 Fases: Recta, Garra, Puño, Plano</span>
+          </button>
+          
+          <button onclick="selectExercise(1)" id="ex-btn-1" class="ex-card p-3.5 rounded-xl border border-slate-700 bg-slate-800/40 text-left transition hover:border-slate-600">
+            <span class="text-[11px] font-bold text-emerald-400 block uppercase">Demostración 2</span>
+            <span class="font-semibold text-white text-xs block mt-0.5">Neurodinamia Mediana</span>
+            <span class="text-[11px] text-slate-400">Excursión del Nervio Mediano</span>
+          </button>
+
+          <button onclick="selectExercise(2)" id="ex-btn-2" class="ex-card p-3.5 rounded-xl border border-slate-700 bg-slate-800/40 text-left transition hover:border-slate-600">
+            <span class="text-[11px] font-bold text-amber-400 block uppercase">Demostración 3</span>
+            <span class="font-semibold text-white text-xs block mt-0.5">Masaje de Cicatriz</span>
+            <span class="text-[11px] text-slate-400">Desensibilización y 'Pillar Pain'</span>
+          </button>
+        </div>
+
+        <!-- CONTENEDOR PRINCIPAL: REPRODUCTOR DE VIDEO/ANIMACIÓN + OBJETIVOS DE T.O. -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          
+          <!-- COLUMNA IZQUIERDA: REPRODUCTOR DE VIDEO / ANIMACIÓN BIOMECÁNICA (6 Cols) -->
+          <div class="lg:col-span-6 bg-slate-950 rounded-2xl border border-slate-800 p-4 flex flex-col justify-between shadow-inner">
+            
+            <!-- Barra superior del Reproductor de Video -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
+                <span class="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider" id="video-title-header">DEMO EN VIDEO: DESLIZAMIENTO TENDINOSO</span>
+              </div>
+              <span id="video-phase-badge" class="text-[10px] bg-teal-900/60 text-teal-300 border border-teal-500/40 px-2 py-0.5 rounded font-mono">Fase 1: Mano Recta</span>
+            </div>
+
+            <!-- Pantalla del Video / Canvas Interactivo -->
+            <div class="relative bg-gradient-to-b from-slate-900 to-slate-950 rounded-xl border border-slate-800/80 h-56 flex items-center justify-center overflow-hidden">
+              <canvas id="hand-video-canvas" width="400" height="220" class="max-w-full h-full"></canvas>
+
+              <!-- Overlay de Guía de Movimiento en Video -->
+              <div class="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[11px] text-slate-400 bg-slate-900/80 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-slate-800">
+                <span id="video-motion-guide" class="text-teal-300 font-medium">Movimiento: Extensión de dedos a 180°</span>
+                <span id="video-speed-label" class="font-mono text-slate-500">1.0x</span>
+              </div>
+            </div>
+
+            <!-- Controles del Video -->
+            <div class="mt-3 space-y-2">
+              <!-- Barra de Progreso del Video / Fases -->
+              <div class="grid grid-cols-4 gap-1.5" id="video-phase-buttons">
+                <button onclick="setVideoPhase(0)" id="vphase-0" class="py-1 px-2 text-[10px] rounded bg-teal-600 text-white font-semibold transition">1. Recta</button>
+                <button onclick="setVideoPhase(1)" id="vphase-1" class="py-1 px-2 text-[10px] rounded bg-slate-800 text-slate-300 hover:text-white font-medium transition">2. Garra</button>
+                <button onclick="setVideoPhase(2)" id="vphase-2" class="py-1 px-2 text-[10px] rounded bg-slate-800 text-slate-300 hover:text-white font-medium transition">3. Puño Cerrado</button>
+                <button onclick="setVideoPhase(3)" id="vphase-3" class="py-1 px-2 text-[10px] rounded bg-slate-800 text-slate-300 hover:text-white font-medium transition">4. Puño Plano</button>
+              </div>
+
+              <!-- Botonera Play / Pause / Velocidad / Audio Guía -->
+              <div class="flex items-center justify-between pt-1">
+                <div class="flex items-center gap-2">
+                  <button onclick="toggleVideoPlay()" id="btn-video-play" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold rounded-lg transition flex items-center gap-1.5 shadow">
+                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    <span id="btn-video-text">Pausar Video</span>
+                  </button>
+                  <button onclick="toggleVideoSpeed()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg transition font-mono">
+                    <span id="btn-speed-text">Velocidad: 1x</span>
+                  </button>
+                </div>
+
+                <button onclick="narrateExerciseAction()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-teal-900/40 text-teal-300 text-xs rounded-lg transition flex items-center gap-1 border border-teal-500/30">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                  <span>Escuchar Guía</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- COLUMNA DERECHA: OBJETIVO DESDE TERAPIA OCUPACIONAL (6 Cols) -->
+          <div class="lg:col-span-6 space-y-4 flex flex-col justify-between">
+            
+            <!-- Caja Destacada: Objetivo Terapéutico Ocupacional -->
+            <div class="bg-gradient-to-br from-teal-950/60 via-slate-900 to-slate-900 border border-teal-500/40 rounded-2xl p-5 shadow-lg space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center font-bold text-xs">🎯</span>
+                <span class="text-xs uppercase font-extrabold text-teal-300 tracking-wider">Objetivo desde Terapia Ocupacional (OTPF-4)</span>
+              </div>
+
+              <h3 id="ot-goal-title" class="text-sm font-bold text-white leading-snug">
+                Maximizar la excursión diferencial de los tendones flexores superficial y profundo
+              </h3>
+
+              <p id="ot-goal-desc" class="text-xs text-slate-300 leading-relaxed">
+                Facilitar el deslizamiento del <em>Flexor Digitorum Superficialis (FDS)</em> respecto al <em>Flexor Digitorum Profundus (FDP)</em> en el canal carpiano, previniendo la formación de adherencias fibróticas y cicatrizales sobre el nervio mediano recientemente descomprimido, salvaguardando el arco articular necesario para pinzas finas y agarres cilíndricos de la vida cotidiana.
+              </p>
+
+              <!-- Tabla de Justificación Clínica -->
+              <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800 text-xs">
+                <div class="bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
+                  <span class="text-[10px] text-slate-400 block font-semibold uppercase">Estructura Diana</span>
+                  <span id="ot-structure" class="font-medium text-teal-300">Tendones Flexores FDS/FDP</span>
+                </div>
+                <div class="bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
+                  <span class="text-[10px] text-slate-400 block font-semibold uppercase">Impacto Ocupacional</span>
+                  <span id="ot-impact" class="font-medium text-emerald-300">Agarres y motricidad fina</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dosificación y Cronómetro Guiado -->
+            <div class="bg-slate-850 border border-slate-700/60 rounded-2xl p-4 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-slate-400 uppercase font-semibold block">Dosificación Prescrita</span>
+                <span id="ex-dosage" class="text-xs font-bold text-white">5 a 10 repeticiones • 3 veces al día</span>
+                <p class="text-[11px] text-slate-400 mt-0.5">Movimiento lento y rítmico, sin provocar dolor agudo.</p>
+              </div>
+
+              <!-- Mini Temporizador -->
+              <div class="flex items-center gap-2">
+                <span id="timer-number" class="text-2xl font-extrabold font-mono text-teal-400">00:45</span>
+                <button onclick="toggleTimer()" id="btn-timer-action" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white font-semibold text-xs rounded-lg transition shadow">
+                  Iniciar
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== DIAPOSITIVA 4: CRONOGRAMA DIARIO CON ALERTAS (¡NUEVO!) ==================== -->
+    <div id="slide-3" class="slide-view w-full hidden">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl space-y-6">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-4 gap-2">
+          <div>
+            <span class="text-xs uppercase font-bold text-teal-400 tracking-wider">Autogestión y Tele-monitoreo Rural</span>
+            <h2 class="text-2xl font-bold text-white mt-0.5">Cronograma Diario de Ejercicios y Pausas Activas</h2>
+          </div>
+          
+          <!-- Estado de Alertas y Hora Actual -->
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 bg-slate-950 px-3 py-1 rounded-xl border border-slate-800 text-xs">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span class="text-slate-400">Hora Simulada:</span>
+              <span id="clock-display" class="font-mono font-bold text-teal-300">10:30 AM</span>
+            </div>
+            <button onclick="testAudioChime()" class="px-3 py-1.5 bg-teal-950 hover:bg-teal-900/60 text-teal-300 border border-teal-700/60 rounded-xl text-xs flex items-center gap-1.5 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+              <span>Probar Alerta Sonora</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Banner Explicativo de Terapia Ocupacional -->
+        <div class="p-3.5 bg-teal-950/40 border border-teal-800/40 rounded-2xl flex items-center justify-between text-xs text-teal-200">
+          <div class="flex items-center gap-2.5">
+            <span class="text-lg">⏰</span>
+            <span><strong>Estrategia de Adherencia en el Campo:</strong> AURA envía recordatorios sonoros y visuales para intercalar el trabajo rural con pausas terapéuticas, evitando sobrecarga acumulada en el túnel carpiano.</span>
+          </div>
+          <span class="text-slate-400 text-[11px] whitespace-nowrap hidden sm:inline">6 Horarios Estratégicos</span>
+        </div>
+
+        <!-- TIMELINE / CRONOGRAMA DE HORARIOS (6 Momentos Clave) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          
+          <!-- Horario 1: 08:00 AM -->
+          <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 flex flex-col justify-between hover:border-teal-500/60 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-mono text-xs font-extrabold text-teal-400 bg-teal-950 px-2.5 py-0.5 rounded-lg border border-teal-800">08:00 AM</span>
+                <span class="text-[10px] text-slate-400 font-semibold uppercase">Rutina Mañana (5 min)</span>
+              </div>
+              <h4 class="font-bold text-white text-xs sm:text-sm">Despertar Articular y Deslizamiento Tendinoso</h4>
+              <p class="text-[11px] text-slate-300 mt-1">Disipa la rigidez articular acumulada durante la noche y prepara los tendones para la actividad.</p>
+            </div>
+            <button onclick="triggerScheduleAlert('08:00 AM', 'Rutina de Despertar Articular', 'Realiza 5 repeticiones suaves de deslizamiento tendinoso. Evita movimientos bruscos matinales.')" class="mt-3 w-full py-1.5 px-3 bg-slate-900 group-hover:bg-teal-600 group-hover:text-white text-slate-300 text-xs font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-slate-700">
+              <span>🔔 Simular Alarma de 8:00 AM</span>
+            </button>
+          </div>
+
+          <!-- Horario 2: 10:30 AM (Pausa Activa) -->
+          <div class="bg-slate-800/40 border border-emerald-500/40 bg-emerald-950/10 rounded-2xl p-4 flex flex-col justify-between hover:border-emerald-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-mono text-xs font-extrabold text-emerald-400 bg-emerald-950 px-2.5 py-0.5 rounded-lg border border-emerald-800">10:30 AM</span>
+                <span class="text-[10px] text-emerald-300 font-semibold uppercase">Pausa Activa (3 min)</span>
+              </div>
+              <h4 class="font-bold text-white text-xs sm:text-sm">Descarga de Pinza y Respiración Postural</h4>
+              <p class="text-[11px] text-slate-300 mt-1">Interrumpe labores manuales continuas en casa o campo. Sacudida gentil de dedos y hombros.</p>
+            </div>
+            <button onclick="triggerScheduleAlert('10:30 AM', 'Pausa Activa Laboral', '¡Suelta lo que estés haciendo! Descansa tus manos durante 3 minutos, abre y cierra los dedos y rota hombros.')" class="mt-3 w-full py-1.5 px-3 bg-slate-900 group-hover:bg-emerald-600 group-hover:text-white text-slate-300 text-xs font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-slate-700">
+              <span>🔔 Simular Alarma de 10:30 AM</span>
+            </button>
+          </div>
+
+          <!-- Horario 3: 01:30 PM -->
+          <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 flex flex-col justify-between hover:border-teal-500/60 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-mono text-xs font-extrabold text-teal-400 bg-teal-950 px-2.5 py-0.5 rounded-lg border border-teal-800">01:30 PM</span>
+                <span class="text-[10px] text-slate-400 font-semibold uppercase">Rutina Mediodía (5 min)</span>
+              </div>
+              <h4 class="font-bold text-white text-xs sm:text-sm">Neurodinamia y Liberación del Nervio Mediano</h4>
+              <p class="text-[11px] text-slate-300 mt-1">Descompresión neural posterior al almuerzo, sin tensión excesiva en el pulgar.</p>
+            </div>
+            <button onclick="triggerScheduleAlert('01:30 PM', 'Neurodinamia del Mediano', 'Hora de tu sesión de deslizamiento del nervio. Extiende suavemente y descansa si sientes parestesias.')" class="mt-3 w-full py-1.5 px-3 bg-slate-900 group-hover:bg-teal-600 group-hover:text-white text-slate-300 text-xs font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-slate-700">
+              <span>🔔 Simular Alarma de 01:30 PM</span>
+            </button>
+          </div>
+
+          <!-- Horario 4: 04:00 PM (Pausa Activa) -->
+          <div class="bg-slate-800/40 border border-emerald-500/40 bg-emerald-950/10 rounded-2xl p-4 flex flex-col justify-between hover:border-emerald-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-mono text-xs font-extrabold text-emerald-400 bg-emerald-950 px-2.5 py-0.5 rounded-lg border border-emerald-800">04:00 PM</span>
+                <span class="text-[10px] text-emerald-300 font-semibold uppercase">Pausa Activa (3 min)</span>
+              </div>
+              <h4 class="font-bold text-white text-xs sm:text-sm">Chequeo de Posición Ergonómica Neutra</h4>
+              <p class="text-[11px] text-slate-300 mt-1">Verificar apoyo de antebrazos sobre la toalla y posición de 90° para evitar fatiga vespertina.</p>
+            </div>
+            <button onclick="triggerScheduleAlert('04:00 PM', 'Chequeo Ergonómico', 'Revisa tu postura: ¿están tus pies en la caja reposapiés y la toalla bajo tus muñecas? Tómate 3 minutos.')" class="mt-3 w-full py-1.5 px-3 bg-slate-900 group-hover:bg-emerald-600 group-hover:text-white text-slate-300 text-xs font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-slate-700">
+              <span>🔔 Simular Alarma de 04:00 PM</span>
+            </button>
+          </div>
+
+          <!-- Horario 5: 06:30 PM -->
+          <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 flex flex-col justify-between hover:border-teal-500/60 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-mono text-xs font-extrabold text-teal-400 bg-teal-950 px-2.5 py-0.5 rounded-lg border border-teal-800">06:30 PM</span>
+                <span class="text-[10px] text-slate-400 font-semibold uppercase">Rutina Tarde (5 min)</span>
+              </div>
+              <h4 class="font-bold text-white text-xs sm:text-sm">Motricidad Fina y Oponencia de Pulgar</h4>
+              <p class="text-[11px] text-slate-300 mt-1">Toques dedo a dedo formando una 'O' redonda sin apretar. Estimula destreza para el día siguiente.</p>
+            </div>
+            <button onclick="triggerScheduleAlert('06:30 PM', 'Pinzas y Oponencia', 'Toca con el pulgar la punta de cada dedo de forma redonda. 8 repeticiones lentas.')" class="mt-3 w-full py-1.5 px-3 bg-slate-900 group-hover:bg-teal-600 group-hover:text-white text-slate-300 text-xs font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-slate-700">
+              <span>🔔 Simular Alarma de 06:30 PM</span>
+            </button>
+          </div>
+
+          <!-- Horario 6: 09:00 PM -->
+          <div class="bg-slate-800/40 border border-amber-500/40 bg-amber-950/10 rounded-2xl p-4 flex flex-col justify-between hover:border-amber-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-mono text-xs font-extrabold text-amber-400 bg-amber-950 px-2.5 py-0.5 rounded-lg border border-amber-800">09:00 PM</span>
+                <span class="text-[10px] text-amber-300 font-semibold uppercase">Rutina Noche (5 min)</span>
+              </div>
+              <h4 class="font-bold text-white text-xs sm:text-sm">Masaje Cicatrizal y Preparación al Sueño</h4>
+              <p class="text-[11px] text-slate-300 mt-1">Masaje con crema hidratante sobre la cicatriz y colocación de férula o posición neutra nocturna.</p>
+            </div>
+            <button onclick="triggerScheduleAlert('09:00 PM', 'Manejo Cicatrizal Nocturno', 'Aplica un poco de crema y realiza círculos suaves durante 3 minutos. Duerme con la muñeca recta.')" class="mt-3 w-full py-1.5 px-3 bg-slate-900 group-hover:bg-amber-600 group-hover:text-white text-slate-300 text-xs font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-slate-700">
+              <span>🔔 Simular Alarma de 09:00 PM</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== DIAPOSITIVA 5: PUESTO DE TRABAJO RURAL INTERACTIVO ==================== -->
+    <div id="slide-4" class="slide-view w-full hidden">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl space-y-6">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-4 gap-2">
+          <div>
+            <span class="text-xs uppercase font-bold text-teal-400 tracking-wider">Ergonomía Comunitaria y Rural</span>
+            <h2 class="text-2xl font-bold text-white mt-0.5">Adaptación del Puesto en el Hogar Rural</h2>
+          </div>
+          <span class="text-xs text-slate-400">Haz clic en cada número para descubrir la adaptación casera</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+          
+          <!-- Hotspot Diagram / Puesto de trabajo visual -->
+          <div class="md:col-span-6 bg-slate-950 p-6 rounded-2xl border border-slate-800 relative flex items-center justify-center min-h-[300px]">
+            
+            <svg class="w-64 h-64 text-slate-600" viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="30" y="110" width="140" height="8" rx="2" class="text-amber-800 stroke-amber-700" fill="#78350f" />
+              <line x1="45" y1="118" x2="45" y2="185" class="stroke-amber-800" stroke-width="5" />
+              <line x1="155" y1="118" x2="155" y2="185" class="stroke-amber-800" stroke-width="5" />
+              <line x1="130" y1="130" x2="130" y2="185" class="stroke-slate-500" stroke-width="4" />
+              <line x1="100" y1="130" x2="100" y2="185" class="stroke-slate-500" stroke-width="4" />
+              <line x1="100" y1="130" x2="140" y2="130" class="stroke-slate-400" stroke-width="4" />
+              <line x1="140" y1="80" x2="140" y2="130" class="stroke-slate-400" stroke-width="4" />
+              <circle cx="125" cy="65" r="12" class="stroke-teal-400" />
+              <line x1="125" y1="77" x2="125" y2="128" class="stroke-teal-400" stroke-width="3" />
+              <line x1="125" y1="88" x2="95" y2="108" class="stroke-teal-400" stroke-width="3" />
+              <line x1="95" y1="108" x2="70" y2="108" class="stroke-teal-300" stroke-width="3" />
+              <line x1="125" y1="128" x2="105" y2="128" class="stroke-teal-400" stroke-width="3" />
+              <line x1="105" y1="128" x2="105" y2="175" class="stroke-teal-400" stroke-width="3" />
+            </svg>
+
+            <!-- Hotspots Clickeables -->
+            <button onclick="showHotspot(1)" id="hs-1" class="absolute left-1/4 top-[48%] w-8 h-8 rounded-full bg-teal-500 text-white font-bold text-xs flex items-center justify-center hotspot-pulse shadow-lg cursor-pointer">1</button>
+            <button onclick="showHotspot(2)" id="hs-2" class="absolute right-[33%] top-[58%] w-8 h-8 rounded-full bg-emerald-500 text-white font-bold text-xs flex items-center justify-center hotspot-pulse shadow-lg cursor-pointer">2</button>
+            <button onclick="showHotspot(3)" id="hs-3" class="absolute right-[44%] bottom-[10%] w-8 h-8 rounded-full bg-cyan-500 text-white font-bold text-xs flex items-center justify-center hotspot-pulse shadow-lg cursor-pointer">3</button>
+            <button onclick="showHotspot(4)" id="hs-4" class="absolute left-[20%] top-[30%] w-8 h-8 rounded-full bg-amber-500 text-white font-bold text-xs flex items-center justify-center hotspot-pulse shadow-lg cursor-pointer">4</button>
+          </div>
+
+          <!-- Explicación Detallada del Hotspot Activo -->
+          <div class="md:col-span-6 space-y-4">
+            <div id="hotspot-card" class="bg-slate-800/60 border border-teal-500/40 rounded-2xl p-5 space-y-3 transition-all">
+              <div class="flex items-center gap-2">
+                <span id="hotspot-badge" class="px-2.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 font-bold text-xs border border-teal-500/30">
+                  Adaptación #1
+                </span>
+                <span id="hotspot-item" class="text-xs text-slate-400">Recurso Casero</span>
+              </div>
+              
+              <h3 id="hotspot-title" class="text-base font-bold text-white">
+                Toalla Enrollada como Soporte Palmar (Mousepad Rural)
+              </h3>
+              
+              <p id="hotspot-desc" class="text-xs text-slate-300 leading-relaxed">
+                Las mesas de madera rústica en el campo tienen filos que comprimen directamente la cicatriz quirúrgica. Doblar o enrollar una toalla de algodón limpia frente a la mesa amortigua el apoyo, alinea la muñeca en posición neutra ($0^\circ$) y reduce la presión sobre el nervio mediano.
+              </p>
+
+              <div class="pt-2 border-t border-slate-700/60 flex items-center justify-between text-xs text-teal-300">
+                <span>Costo de Implementación: <strong>$0 COP</strong></span>
+                <span>Material: <strong>100% Hogareño</strong></span>
+              </div>
+            </div>
+
+            <!-- Botones selectores rápidos -->
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <button onclick="showHotspot(1)" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-left">
+                1. Toalla reposamuñecas
+              </button>
+              <button onclick="showHotspot(2)" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-left">
+                2. Cojín firme en asiento
+              </button>
+              <button onclick="showHotspot(3)" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-left">
+                3. Caja de frutas reposapiés
+              </button>
+              <button onclick="showHotspot(4)" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-left">
+                4. Libros elevadores de pantalla
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== DIAPOSITIVA 6: EL AGENTE VIRTUAL EN VIVO (SIMULADOR DE CHAT Y VOZ) ==================== -->
+    <div id="slide-5" class="slide-view w-full hidden">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-3 gap-2">
+          <div class="flex items-center gap-3">
+            <div class="relative">
+              <div class="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center font-bold text-white text-base shadow">
+                AU
+              </div>
+              <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-slate-900"></span>
+            </div>
+            <div>
+              <h2 class="text-base font-bold text-white flex items-center gap-2">
+                Simulador del Agente AURA en Vivo
+                <span class="text-[10px] bg-teal-950 text-teal-300 border border-teal-700 px-2 py-0.5 rounded-full">Tele-rehabilitación Activa</span>
+              </h2>
+              <p class="text-xs text-slate-400">Prueba cómo responde a preguntas del paciente campesino en recuperación</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="toggleVoiceOutput()" id="btn-voice-toggle" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-teal-300 border border-teal-500/30 flex items-center gap-1.5 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+              <span id="voice-label">Voz: Activada</span>
+            </button>
+            <button onclick="clearDemoChat()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition" title="Limpiar chat">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="demo-chat-box" class="h-64 sm:h-72 bg-slate-950/80 rounded-2xl p-4 overflow-y-auto space-y-3 custom-scroll border border-slate-800">
+          <div class="flex items-start gap-2.5">
+            <div class="w-7 h-7 rounded-lg bg-teal-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">AU</div>
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-sm p-3 text-xs text-slate-200 max-w-[85%] space-y-1.5 shadow-sm">
+              <p class="font-semibold text-teal-300">¡Hola Carlos! Soy AURA, tu agente de Terapia Ocupacional.</p>
+              <p>Sé que viajar hasta el pueblo te toma más de dos horas. Por eso estoy aquí para recordarte tus ejercicios de hoy, ayudarte a acomodar tu mesa con cosas de la casa y cuidar tu mano operada.</p>
+              <p class="text-slate-400 text-[11px]">Puedes hacer clic en cualquiera de las consultas rápidas de abajo o escribirme lo que sientes.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chips de Consultas -->
+        <div class="flex flex-wrap gap-1.5">
+          <button onclick="sendQuickPrompt('¿Qué ejercicios me tocan hacer a esta hora según el cronograma?')" class="text-xs bg-slate-800 hover:bg-teal-900/40 hover:text-teal-300 text-slate-300 px-3 py-1.5 rounded-full border border-slate-700 transition">
+            📋 ¿Qué ejercicio me toca a esta hora?
+          </button>
+          <button onclick="sendQuickPrompt('¿Cómo lavo los platos o escurro ropa sin lastimarme la mano operada?')" class="text-xs bg-slate-800 hover:bg-teal-900/40 hover:text-teal-300 text-slate-300 px-3 py-1.5 rounded-full border border-slate-700 transition">
+            🧺 ¿Cómo escurro ropa o lavo platos?
+          </button>
+          <button onclick="sendQuickPrompt('Amanecí con una puntada fuerte y la mano caliente, ¿qué hago?')" class="text-xs bg-slate-800 hover:bg-rose-900/40 hover:text-rose-300 text-slate-300 px-3 py-1.5 rounded-full border border-slate-700 transition">
+            ⚠️ Tengo dolor agudo y calor en la herida
+          </button>
+          <button onclick="sendQuickPrompt('¿Cómo acomodo mi mesa de madera para que no me talle la cicatriz?')" class="text-xs bg-slate-800 hover:bg-emerald-900/40 hover:text-emerald-300 text-slate-300 px-3 py-1.5 rounded-full border border-slate-700 transition">
+            🪑 Me talla el filo de la mesa de madera
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <input type="text" id="demo-input" onkeypress="handleInputKey(event)" placeholder="Escribe tu consulta al agente (ej. '¿Puedo cargar un balde con agua?')..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500">
+          <button onclick="sendDemoMessage()" class="px-4 py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-semibold shadow transition flex items-center gap-1.5">
+            <span>Enviar</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== DIAPOSITIVA 7: CONCLUSIONES Y EVALUACIÓN UMB ==================== -->
+    <div id="slide-6" class="slide-view w-full hidden">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl space-y-6">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-4 gap-2">
+          <div>
+            <span class="text-xs uppercase font-bold text-teal-400 tracking-wider">Cierre y Conclusiones del Proyecto</span>
+            <h2 class="text-2xl font-bold text-white mt-0.5">Impacto Ocupacional del Agente Virtual</h2>
+          </div>
+          <span class="text-xs text-teal-300 font-mono bg-teal-950 px-3 py-1 rounded-full border border-teal-800">UMB Salud Rural</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-5 space-y-2.5">
+            <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center font-bold text-lg">92%</div>
+            <h3 class="font-bold text-white text-sm">Adherencia al Tratamiento</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              El cronograma programado y las alertas auditivas mitigan el olvido de los ejercicios prescritos, reduciendo la incidencia de rigidez y adherencias post-QX.
+            </p>
+          </div>
+
+          <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-5 space-y-2.5">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg">$0</div>
+            <h3 class="font-bold text-white text-sm">Acceso Ergonómico Real</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              La adaptación de muebles con toallas, cojines y cajas de madera derriba la creencia de que la ergonomía solo es posible con accesorios costosos de oficina.
+            </p>
+          </div>
+
+          <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-5 space-y-2.5">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg">100%</div>
+            <h3 class="font-bold text-white text-sm">Seguridad y Triaje Ocupacional</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              El agente detecta banderas rojas (dolor agudo >6/10, calor en herida) y orienta con urgencia la derivación médica hacia el puesto de salud rural.
+            </p>
+          </div>
+        </div>
+
+        <!-- Resumen final y créditos -->
+        <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <h4 class="text-sm font-bold text-white">Presentación elaborada para Terapia Ocupacional • UMB</h4>
+            <p class="text-xs text-slate-400">Trabajo colaborativo en parejas: Creación de Agente Virtual para prescripción, ergonomía y cronograma.</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="goToSlide(0)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition">
+              Volver al Inicio
+            </button>
+            <button onclick="goToSlide(5)" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold rounded-xl transition">
+              Abrir Simulador del Agente
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL DE ALERTA DE CRONOGRAMA SIMULADA -->
+  <div id="schedule-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-teal-500/50 text-center space-y-4 relative">
+      <div class="w-14 h-14 bg-teal-500/20 border border-teal-400/40 text-teal-400 rounded-2xl mx-auto flex items-center justify-center text-2xl shadow-inner">
+        🔔
+      </div>
+      <div>
+        <span id="modal-alert-time" class="text-xs font-mono font-bold text-teal-400 uppercase tracking-widest bg-teal-950 px-2.5 py-1 rounded-md border border-teal-800">
+          ALERTA • 10:30 AM
+        </span>
+        <h3 id="modal-alert-title" class="font-extrabold text-white text-lg mt-2">
+          ¡Hora de tu Pausa Activa Terapéutica!
+        </h3>
+        <p id="modal-alert-desc" class="text-xs text-slate-300 mt-1 leading-relaxed">
+          Hola Carlos, han transcurrido 2 horas y media de labor. Tómate 3 minutos para relajar la mano intervenida y hacer apertura de dedos.
+        </p>
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button onclick="dismissScheduleModalAndGoExercises()" class="flex-1 bg-teal-600 hover:bg-teal-500 text-white font-semibold text-xs py-2.5 rounded-xl transition shadow">
+          Ver Demostración en Video
+        </button>
+        <button onclick="dismissScheduleModal()" class="px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-xl transition">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT DE LA PRESENTACIÓN INTERACTIVA -->
+  <script>
+    let currentSlide = 0;
+    const totalSlides = 7;
+    let voiceEnabled = true;
+
+    function updateSlideUI() {
+      for (let i = 0; i < totalSlides; i++) {
+        const el = document.getElementById(`slide-${i}`);
+        if (el) el.classList.add('hidden');
+        const dot = document.getElementById(`dot-${i}`);
+        if (dot) {
+          dot.classList.remove('bg-teal-600', 'text-white');
+          dot.classList.add('text-slate-400');
+        }
+      }
+
+      const activeEl = document.getElementById(`slide-${currentSlide}`);
+      if (activeEl) activeEl.classList.remove('hidden');
+
+      const activeDot = document.getElementById(`dot-${currentSlide}`);
+      if (activeDot) {
+        activeDot.classList.remove('text-slate-400');
+        activeDot.classList.add('bg-teal-600', 'text-white');
+      }
+
+      document.getElementById('slide-indicator').innerText = `${currentSlide + 1} / ${totalSlides}`;
+      
+      // Si entramos a la diapositiva de ejercicios, asegurar animación de video
+      if (currentSlide === 2) {
+        startVideoLoop();
+      }
+    }
+
+    function goToSlide(index) {
+      if (index >= 0 && index < totalSlides) {
+        currentSlide = index;
+        updateSlideUI();
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateSlideUI();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlideUI();
+      }
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT') return;
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') nextSlide();
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevSlide();
+    });
+
+    // ==================== SIMULADOR DE VIDEO BIOMECÁNICO EN CANVAS ====================
+    const canvas = document.getElementById('hand-video-canvas');
+    const ctx = canvas.getContext('2d');
+    let videoPlaying = true;
+    let videoSpeed = 1.0;
+    let currentEx = 0; // 0: Tendones, 1: Neurodinamia, 2: Cicatriz
+    let videoPhase = 0; // 0, 1, 2, 3
+    let animProgress = 0; // 0.0 a 1.0
+    let videoAnimId = null;
+
+    const exerciseDetails = [
+      {
+        header: "DEMO EN VIDEO: DESLIZAMIENTO TENDINOSO (WEHBÉ & HUNTER)",
+        goalTitle: "Maximizar la excursión diferencial de los tendones flexores (FDS y FDP)",
+        goalDesc: "Facilitar el deslizamiento del Flexor Digitorum Superficialis (FDS) respecto al Flexor Digitorum Profundus (FDP) en el canal carpiano. Previene la formación de adherencias fibróticas y cicatrizales sobre el nervio mediano, conservando el arco articular de la mano para pinzas finas y agarres funcionales.",
+        structure: "Tendones Flexores FDS/FDP y Retináculo",
+        impact: "Agarres de fuerza y pinza digital",
+        dosage: "5 a 10 repeticiones • 3 veces al día",
+        phases: [
+          { name: "Fase 1: Mano Recta", motion: "Extensión activa de dedos a 180°" },
+          { name: "Fase 2: Garra / Gancho", motion: "Flexión de interfalángicas con MCF a 0°" },
+          { name: "Fase 3: Puño Completo", motion: "Flexión armónica suave de todos los dedos" },
+          { name: "Fase 4: Puño Plano / Escuadra", motion: "Flexión MCF a 90° con IF extendidas" }
+        ],
+        timerSecs: 45
+      },
+      {
+        header: "DEMO EN VIDEO: NEURODINAMIA DEL NERVIO MEDIANO",
+        goalTitle: "Restaurar la movilidad longitudinal y flujo axoplasmático del nervio mediano",
+        goalDesc: "Promover el deslizamiento mecánico libre del tronco del nervio mediano a través del túnel carpiano recién intervenido, disminuyendo la mecanosensibilidad neural intrínseca y evitando la fijación del nervio al lecho de cicatrización sin generar tensión nociceptiva excesiva.",
+        structure: "Nervio Mediano y Raíces C6-T1",
+        impact: "Sensibilidad palmar y pulgar sin parestesia",
+        dosage: "3 a 5 repeticiones • Mantener 3 seg • 3 veces/día",
+        phases: [
+          { name: "Fase 1: Posición Neutra", motion: "Codo a 90°, muñeca neutra a 0°" },
+          { name: "Fase 2: Extensión Suave", motion: "Extensión dorsal de muñeca (20°-30°)" },
+          { name: "Fase 3: Abducción de Pulgar", motion: "Apertura lateral suave del pulgar" },
+          { name: "Fase 4: Relajación de Descarga", motion: "Retorno a posición de reposo libre" }
+        ],
+        timerSecs: 30
+      },
+      {
+        header: "DEMO EN VIDEO: MASAJE Y DESENSIBILIZACIÓN CICATRIZAL",
+        goalTitle: "Reorganizar el colágeno cicatrizal y prevenir el síndrome del 'Pillar Pain'",
+        goalDesc: "Aplicar estímulos mecánicos circulares y transversos controlados que favorecen la alineación de las fibras de colágeno en la incisión del ligamento transverso del carpo, desensibilizando los corpúsculos de Pacini y Meissner para tolerar el apoyo palmar y evitar hipersensibilidad dolorosa.",
+        structure: "Cicatriz palmar y eminencias tenar/hipotenar",
+        impact: "Apoyo palmar en mesa y sujeción de objetos",
+        dosage: "3 a 5 minutos • 2 a 3 veces al día con crema neutra",
+        phases: [
+          { name: "Fase 1: Aplicación de Emoliente", motion: "Crema neutra sin alcohol sobre cicatriz" },
+          { name: "Fase 2: Fricción Circular Suave", motion: "Círculos concéntricos con pulgar opuesto" },
+          { name: "Fase 3: Movilización Transversal", motion: "Fricción perpendicular a la incisión" },
+          { name: "Fase 4: Desensibilización Textil", motion: "Paseo de algodón o toalla suave" }
+        ],
+        timerSecs: 90
+      }
+    ];
+
+    function selectExercise(idx) {
+      currentEx = idx;
+      videoPhase = 0;
+      animProgress = 0;
+
+      for (let i = 0; i < 3; i++) {
+        const btn = document.getElementById(`ex-btn-${i}`);
+        if (btn) {
+          btn.classList.remove('border-teal-500', 'bg-teal-950/40');
+          btn.classList.add('border-slate-700', 'bg-slate-800/40');
+        }
+      }
+      document.getElementById(`ex-btn-${idx}`).classList.remove('border-slate-700', 'bg-slate-800/40');
+      document.getElementById(`ex-btn-${idx}`).classList.add('border-teal-500', 'bg-teal-950/40');
+
+      const data = exerciseDetails[idx];
+      document.getElementById('video-title-header').innerText = data.header;
+      document.getElementById('ot-goal-title').innerText = data.goalTitle;
+      document.getElementById('ot-goal-desc').innerHTML = data.goalDesc;
+      document.getElementById('ot-structure').innerText = data.structure;
+      document.getElementById('ot-impact').innerText = data.impact;
+      document.getElementById('ex-dosage').innerText = data.dosage;
+
+      // Actualizar botones de fases
+      for (let p = 0; p < 4; p++) {
+        document.getElementById(`vphase-${p}`).innerText = `${p+1}. ${data.phases[p].name.split(':')[1] || data.phases[p].name}`;
+      }
+      updateVideoPhaseButtons();
+      resetTimer();
+    }
+
+    function updateVideoPhaseButtons() {
+      for (let p = 0; p < 4; p++) {
+        const b = document.getElementById(`vphase-${p}`);
+        if (p === videoPhase) {
+          b.className = 'py-1 px-2 text-[10px] rounded bg-teal-600 text-white font-semibold transition';
+        } else {
+          b.className = 'py-1 px-2 text-[10px] rounded bg-slate-800 text-slate-300 hover:text-white font-medium transition';
+        }
+      }
+      const data = exerciseDetails[currentEx];
+      document.getElementById('video-phase-badge').innerText = data.phases[videoPhase].name;
+      document.getElementById('video-motion-guide').innerText = `Movimiento: ${data.phases[videoPhase].motion}`;
+    }
+
+    function setVideoPhase(p) {
+      videoPhase = p;
+      animProgress = 0;
+      updateVideoPhaseButtons();
+    }
+
+    function toggleVideoPlay() {
+      videoPlaying = !videoPlaying;
+      const btn = document.getElementById('btn-video-play');
+      const text = document.getElementById('btn-video-text');
+      if (videoPlaying) {
+        text.innerText = 'Pausar Video';
+        btn.classList.remove('bg-amber-600');
+        btn.classList.add('bg-teal-600');
+      } else {
+        text.innerText = 'Reanudar Video';
+        btn.classList.remove('bg-teal-600');
+        btn.classList.add('bg-amber-600');
+      }
+    }
+
+    function toggleVideoSpeed() {
+      if (videoSpeed === 1.0) {
+        videoSpeed = 0.5;
+      } else if (videoSpeed === 0.5) {
+        videoSpeed = 1.5;
+      } else {
+        videoSpeed = 1.0;
+      }
+      document.getElementById('btn-speed-text').innerText = `Velocidad: ${videoSpeed}x`;
+      document.getElementById('video-speed-label').innerText = `${videoSpeed}x`;
+    }
+
+    function renderHandVideoFrame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Fondo tecnológico sutil
+      ctx.fillStyle = '#090d16';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Cuadrícula sutil biomecánica
+      ctx.strokeStyle = 'rgba(13, 148, 136, 0.08)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < canvas.width; x += 25) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += 25) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+      }
+
+      // Dibujo biomecánico según el ejercicio activo
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2 + 15;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      if (currentEx === 0) {
+        // EX 1: Deslizamiento Tendinoso (4 Fases Wehbé & Hunter)
+        drawTendonGlidePhase(videoPhase, animProgress);
+      } else if (currentEx === 1) {
+        // EX 2: Neurodinamia Mediana
+        drawMedianNerveGlide(videoPhase, animProgress);
+      } else {
+        // EX 3: Masaje de Cicatriz
+        drawScarMassage(videoPhase, animProgress);
+      }
+
+      ctx.restore();
+
+      // Timecode de video en esquina superior
+      ctx.font = '10px monospace';
+      ctx.fillStyle = '#14b8a6';
+      ctx.fillText(`REC ● 00:0${videoPhase + 1}:${Math.floor(animProgress * 30).toString().padStart(2, '0')}`, 12, 20);
+
+      // Avanzar progreso si está reproduciendo
+      if (videoPlaying) {
+        animProgress += 0.012 * videoSpeed;
+        if (animProgress >= 1.0) {
+          animProgress = 0;
+          videoPhase = (videoPhase + 1) % 4;
+          updateVideoPhaseButtons();
+        }
+      }
+
+      videoAnimId = requestAnimationFrame(renderHandVideoFrame);
+    }
+
+    function drawTendonGlidePhase(phase, t) {
+      // Muñeca y Palma
+      ctx.fillStyle = '#1e293b';
+      ctx.strokeStyle = '#0d9488';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      // Antebrazo / Muñeca
+      ctx.beginPath();
+      ctx.roundRect(-25, 45, 50, 50, [4, 4, 10, 10]);
+      ctx.fill();
+      ctx.stroke();
+
+      // Nervio Mediano (Línea amarilla / dorada brillante que desliza)
+      const nerveOffset = Math.sin(t * Math.PI * 2) * 4;
+      ctx.strokeStyle = '#eab308';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(0, 90);
+      ctx.lineTo(0, 45 + nerveOffset);
+      ctx.stroke();
+
+      // Cicatriz pequeña en muñeca
+      ctx.strokeStyle = '#f43f5e';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-6, 52); ctx.lineTo(6, 58);
+      ctx.stroke();
+
+      // Palma de la mano
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = '#14b8a6';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(-30, -10, 60, 55, 12);
+      ctx.fill();
+      ctx.stroke();
+
+      // Pulgar
+      ctx.beginPath();
+      ctx.moveTo(-30, 20);
+      ctx.quadraticCurveTo(-50, 15, -45, -5);
+      ctx.stroke();
+
+      // Dedos según fase Wehbé & Hunter
+      const fingerX = [-20, -7, 7, 20];
+      const fingerLengths = [45, 52, 48, 40];
+
+      fingerX.forEach((fx, i) => {
+        const fl = fingerLengths[i];
+        ctx.strokeStyle = '#2dd4bf';
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+
+        if (phase === 0) {
+          // Fase 1: Recta extendida
+          ctx.moveTo(fx, -10);
+          ctx.lineTo(fx, -10 - fl);
+        } else if (phase === 1) {
+          // Fase 2: Garra / Gancho (MCF recta, IFP e IFD flexionadas)
+          ctx.moveTo(fx, -10);
+          ctx.lineTo(fx, -10 - fl * 0.5);
+          ctx.lineTo(fx + 10, -10 - fl * 0.5 + 15);
+        } else if (phase === 2) {
+          // Fase 3: Puño completo cerrado
+          ctx.moveTo(fx, -10);
+          ctx.lineTo(fx, -10 - fl * 0.3);
+          ctx.lineTo(fx + 8, 5);
+        } else if (phase === 3) {
+          // Fase 4: Puño plano / escuadra (MCF a 90°, IF rectas)
+          ctx.moveTo(fx, -10);
+          ctx.lineTo(fx, 5);
+          ctx.lineTo(fx + 15, 5);
+        }
+        ctx.stroke();
+
+        // Nodos articulares
+        ctx.fillStyle = '#f0fdfa';
+        ctx.beginPath();
+        ctx.arc(fx, -10, 3, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function drawMedianNerveGlide(phase, t) {
+      ctx.strokeStyle = '#0d9488';
+      ctx.fillStyle = '#0f172a';
+      ctx.lineWidth = 3;
+
+      // Antebrazo horizontal con ángulo de codo
+      ctx.beginPath();
+      ctx.roundRect(-70, 10, 90, 35, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      // Muñeca y Mano en extensión variable según la fase
+      const extAngle = phase === 1 ? -0.35 : (phase === 2 ? -0.45 : -0.1);
+      ctx.save();
+      ctx.translate(20, 25);
+      ctx.rotate(extAngle);
+
+      // Palma
+      ctx.beginPath();
+      ctx.roundRect(0, -18, 55, 36, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      // Dedos extendidos
+      ctx.strokeStyle = '#2dd4bf';
+      ctx.beginPath();
+      ctx.moveTo(55, -12); ctx.lineTo(85, -12);
+      ctx.moveTo(55, -4); ctx.lineTo(92, -4);
+      ctx.moveTo(55, 4); ctx.lineTo(88, 4);
+      ctx.moveTo(55, 12); ctx.lineTo(80, 12);
+      ctx.stroke();
+
+      // Pulgar en abducción suave
+      const thumbSpread = phase === 2 ? 18 : 8;
+      ctx.strokeStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.moveTo(15, -18); ctx.lineTo(30, -18 - thumbSpread);
+      ctx.stroke();
+
+      ctx.restore();
+
+      // Haz del Nervio Mediano que se ilumina
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(-60, 27);
+      ctx.lineTo(20, 27);
+      ctx.lineTo(20 + Math.cos(extAngle)*35, 27 + Math.sin(extAngle)*35);
+      ctx.stroke();
+    }
+
+    function drawScarMassage(phase, t) {
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = '#0d9488';
+      ctx.lineWidth = 3;
+
+      // Palma abierta hacia arriba
+      ctx.beginPath();
+      ctx.roundRect(-40, -30, 80, 75, 14);
+      ctx.fill();
+      ctx.stroke();
+
+      // Dedos en reposo
+      ctx.strokeStyle = '#2dd4bf';
+      [-25, -9, 9, 25].forEach(x => {
+        ctx.beginPath(); ctx.moveTo(x, -30); ctx.lineTo(x, -65); ctx.stroke();
+      });
+
+      // Cicatriz en talón de la mano
+      ctx.strokeStyle = '#f43f5e';
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(-8, 15); ctx.lineTo(8, 25);
+      ctx.stroke();
+
+      // Pulgar opuesto realizando el masaje en círculos
+      const circleR = 12;
+      const angle = t * Math.PI * 2;
+      const mx = Math.cos(angle) * circleR;
+      const my = 20 + Math.sin(angle) * circleR;
+
+      // Anillo de masaje
+      ctx.strokeStyle = 'rgba(45, 212, 191, 0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(0, 20, circleR, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Yema del pulgar que masajea
+      ctx.fillStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.arc(mx, my, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    function startVideoLoop() {
+      if (!videoAnimId) {
+        renderHandVideoFrame();
+      }
+    }
+
+    function narrateExerciseAction() {
+      const data = exerciseDetails[currentEx];
+      const text = `${data.header}. ${data.phases[videoPhase].name}. ${data.phases[videoPhase].motion}. Objetivo de Terapia Ocupacional: ${data.goalTitle}.`;
+      speakText(text);
+    }
+
+    // ==================== TEMPORIZADOR CLÍNICO ====================
+    let timerRunning = false;
+    let timerInterval = null;
+    let timerSecs = 45;
+
+    function toggleTimer() {
+      const btn = document.getElementById('btn-timer-action');
+      if (timerRunning) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        btn.innerText = 'Reanudar';
+        btn.classList.remove('bg-amber-600');
+        btn.classList.add('bg-teal-600');
+      } else {
+        timerRunning = true;
+        btn.innerText = 'Pausar';
+        btn.classList.remove('bg-teal-600');
+        btn.classList.add('bg-amber-600');
+
+        timerInterval = setInterval(() => {
+          if (timerSecs > 0) {
+            timerSecs--;
+            updateTimerDisplay();
+          } else {
+            clearInterval(timerInterval);
+            timerRunning = false;
+            btn.innerText = '¡Listo!';
+            playChimeSound();
+            speakText("Has completado las repeticiones prescritas para este ejercicio. Muy bien hecho.");
+          }
+        }, 1000);
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      timerSecs = exerciseDetails[currentEx].timerSecs;
+      updateTimerDisplay();
+      const btn = document.getElementById('btn-timer-action');
+      if (btn) {
+        btn.innerText = 'Iniciar';
+        btn.classList.remove('bg-amber-600');
+        btn.classList.add('bg-teal-600');
+      }
+    }
+
+    function updateTimerDisplay() {
+      const m = Math.floor(timerSecs / 60);
+      const s = timerSecs % 60;
+      const el = document.getElementById('timer-number');
+      if (el) el.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    // ==================== CRONOGRAMA, ALERTAS Y SONIDO (WEB AUDIO API) ====================
+    function playChimeSound() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Tono 1
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+        gain1.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+        osc1.connect(gain1);
+        gain1.connect(audioCtx.destination);
+        osc1.start();
+        osc1.stop(audioCtx.currentTime + 0.6);
+
+        // Tono 2 (Acorde armónico superior)
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(880.00, audioCtx.currentTime + 0.18); // A5
+        gain2.gain.setValueAtTime(0.18, audioCtx.currentTime + 0.18);
+        gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.9);
+        osc2.connect(gain2);
+        gain2.connect(audioCtx.destination);
+        osc2.start(audioCtx.currentTime + 0.18);
+        osc2.stop(audioCtx.currentTime + 0.9);
+      } catch (e) {
+        console.warn('AudioContext no disponible o bloqueado por el navegador:', e);
+      }
+    }
+
+    function testAudioChime() {
+      playChimeSound();
+      speakText("Alerta de cronograma activada. Esta es la señal de aviso para tus ejercicios en el hogar.");
+    }
+
+    function triggerScheduleAlert(time, title, desc) {
+      playChimeSound();
+      document.getElementById('modal-alert-time').innerText = `ALERTA PROGRAMADA • ${time}`;
+      document.getElementById('modal-alert-title').innerText = title;
+      document.getElementById('modal-alert-desc').innerText = desc;
+      document.getElementById('schedule-modal').classList.remove('hidden');
+
+      speakText(`Atención Carlos. Son las ${time}. ${title}. ${desc}`);
+    }
+
+    function dismissScheduleModal() {
+      document.getElementById('schedule-modal').classList.add('hidden');
+    }
+
+    function dismissScheduleModalAndGoExercises() {
+      dismissScheduleModal();
+      goToSlide(2);
+    }
+
+    // ==================== HOTSPOTS ERGONÓMICOS ====================
+    const hotspotData = {
+      1: {
+        badge: "Adaptación #1",
+        item: "Borde de la Mesa",
+        title: "Toalla Enrollada como Soporte Palmar (Mousepad Rural)",
+        desc: "Las mesas de madera rústica en el campo tienen filos vivos que comprimen directamente la cicatriz quirúrgica. Enrollar una toalla de algodón limpia frente a la mesa amortigua el apoyo, alinea la muñeca en posición neutra (0°) y previene la compresión del nervio mediano.",
+        cost: "$0 COP"
+      },
+      2: {
+        badge: "Adaptación #2",
+        item: "Silla del Comedor",
+        title: "Cojín Firme para Regla de 90° en Codos",
+        desc: "Las sillas rurales suelen ser más bajas que las mesas de trabajo, obligando al paciente a levantar los hombros o flexionar las muñecas hacia arriba. Colocar un cojín firme en la base nivela la altura del antebrazo con la mesa a exactamente 90 grados.",
+        cost: "$0 COP"
+      },
+      3: {
+        badge: "Adaptación #3",
+        item: "Suelo / Apoyo de Piernas",
+        title: "Caja de Frutas o Madera como Reposapiés",
+        desc: "Al elevar la silla con un cojín, los pies del paciente pueden quedar suspendidos en el aire, lo que genera sobrecarga en la región lumbar y hombros. Utilizar un cajón pequeño de madera o libros gruesos estabiliza la pelvis y relaja la cintura escapular.",
+        cost: "$0 COP"
+      },
+      4: {
+        badge: "Adaptación #4",
+        item: "Superficie de Lectura / Pantalla",
+        title: "Elevador Casero para Evitar Encorvamiento",
+        desc: "Elevar los materiales de lectura o la pantalla con una caja o tarima de madera mantiene la mirada horizontal y libera la carga de los brazos y cuello.",
+        cost: "$0 COP"
+      }
+    };
+
+    function showHotspot(num) {
+      const data = hotspotData[num];
+      document.getElementById('hotspot-badge').innerText = data.badge;
+      document.getElementById('hotspot-item').innerText = data.item;
+      document.getElementById('hotspot-title').innerText = data.title;
+      document.getElementById('hotspot-desc').innerHTML = data.desc;
+    }
+
+    // ==================== SIMULADOR DE CHATBOT Y VOZ ====================
+    function toggleVoiceOutput() {
+      voiceEnabled = !voiceEnabled;
+      const label = document.getElementById('voice-label');
+      label.innerText = voiceEnabled ? 'Voz: Activada' : 'Voz: Silenciada';
+      if (!voiceEnabled && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    function speakText(text) {
+      if (!voiceEnabled || !('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const clean = text.replace(/<[^>]*>?/gm, '');
+      const utterance = new SpeechSynthesisUtterance(clean);
+      utterance.lang = 'es-ES';
+      utterance.rate = 1.0;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function handleInputKey(e) {
+      if (e.key === 'Enter') sendDemoMessage();
+    }
+
+    function sendQuickPrompt(text) {
+      document.getElementById('demo-input').value = text;
+      sendDemoMessage();
+    }
+
+    function sendDemoMessage() {
+      const input = document.getElementById('demo-input');
+      const val = input.value.trim();
+      if (!val) return;
+
+      appendChatMessage('user', val);
+      input.value = '';
+
+      setTimeout(() => {
+        const response = generateAuraResponse(val);
+        appendChatMessage('aura', response);
+        speakText(response);
+      }, 500);
+    }
+
+    function appendChatMessage(sender, html) {
+      const box = document.getElementById('demo-chat-box');
+      const div = document.createElement('div');
+
+      if (sender === 'user') {
+        div.className = 'flex items-start justify-end gap-2.5';
+        div.innerHTML = `
+          <div class="bg-teal-600 text-white rounded-2xl rounded-tr-sm p-3 text-xs max-w-[85%] shadow-sm leading-relaxed">
+            ${html}
+          </div>
+        `;
+      } else {
+        div.className = 'flex items-start gap-2.5';
+        div.innerHTML = `
+          <div class="w-7 h-7 rounded-lg bg-teal-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">AU</div>
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-sm p-3 text-xs text-slate-200 max-w-[85%] space-y-1.5 shadow-sm leading-relaxed">
+            ${html}
+          </div>
+        `;
+      }
+
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function generateAuraResponse(query) {
+      const q = query.toLowerCase();
+
+      if (q.includes('cronograma') || q.includes('hora') || q.includes('horario') || q.includes('toca')) {
+        return `<strong>Según tu cronograma terapéutico de hoy:</strong><br>
+        • Si es la mañana (8:00 AM): Realiza tus <strong>deslizamientos tendinosos</strong> (5 min).<br>
+        • A media mañana (10:30 AM): Es tu <strong>Pausa Activa</strong> de 3 min para soltar herramientas.<br>
+        • Al mediodía (1:30 PM): <strong>Neurodinamia del nervio mediano</strong>.<br>
+        • En la noche (9:00 PM): <strong>Masaje de cicatriz</strong> con crema neutra.`;
+      }
+
+      if (q.includes('escurrir') || q.includes('ropa') || q.includes('platos') || q.includes('lavar') || q.includes('balde')) {
+        return `<strong>¡Cuidado con el movimiento de retorcer!</strong> Al escurrir la ropa girando hacia lados opuestos, comprimes fuertemente la cicatriz y el túnel carpiano.<br>
+        <strong>Cómo hacerlo seguro:</strong> Dobla la prenda contra el borde del lavadero y compáctala hacia abajo usando la palma plana de ambas manos, sin girar las muñecas. Para baldes, usa las dos manos apoyadas en el antebrazo.`;
+      }
+
+      if (q.includes('dolor') || q.includes('caliente') || q.includes('puntada') || q.includes('herida') || q.includes('fiebre')) {
+        return `<span class="text-rose-400 font-bold">⚠️ ALERTA CLÍNICA:</span> Si sientes una puntada intensa persistente, o notas la herida roja, caliente al tacto o con salida de secreción, <strong>debes suspender inmediatamente los ejercicios</strong>. Comunícate de inmediato con el puesto de salud rural más cercano o consulta con tu médico tratante.`;
+      }
+
+      if (q.includes('mesa') || q.includes('madera') || q.includes('talla') || q.includes('filo') || q.includes('acomodo') || q.includes('silla')) {
+        return `Para solucionar el filo de la mesa de madera en el campo, <strong>enrolla una toalla de manos limpia</strong> justo frente al borde donde apoyas la mano. Así tu cicatriz descansará sobre tela suave y mantendrás la muñeca recta a cero grados.`;
+      }
+
+      return `Entiendo lo que me comentas, Carlos. Como tu agente de Terapia Ocupacional en el campo, mi misión es cuidar tu cicatriz y ayudarte a recuperar la fuerza de tus dedos paso a paso. Recuerda no cargar más de 1 kilo con la mano operada durante estas primeras semanas. ¿Tienes alguna otra duda sobre tus ejercicios o labores del día?`;
+    }
+
+    function clearDemoChat() {
+      const box = document.getElementById('demo-chat-box');
+      box.innerHTML = `
+        <div class="flex items-start gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-teal-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">AU</div>
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-sm p-3 text-xs text-slate-200 max-w-[85%] space-y-1.5 shadow-sm">
+            <p class="font-semibold text-teal-300">Chat reiniciado.</p>
+            <p>Hola Carlos, ¿en qué tarea o ejercicio de tu recuperación te gustaría que nos enfoquemos?</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // Inicialización al cargar la ventana
+    window.addEventListener('DOMContentLoaded', () => {
+      selectExercise(0);
+      startVideoLoop();
+    });
+  </script>
+</body>
+</html>
